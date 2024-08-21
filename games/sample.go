@@ -91,20 +91,19 @@ func (s *Sample) sendGift(ctx context.Context, gift params.Gift) params.CommonRe
 // SearchUser 查询玩家信息，玩家在KOP商城购买道具时，需要绑定玩家id，才能下单
 func (s *Sample) SearchUser(ctx context.Context, notification params.Notification) params.CommonResult {
 	/*
-		玩家信息查询类型的消息通知的数据结构
-		{
-		  "notification_type": "user_search",
-		  "settings": {
-		    "merchant_id": 1006805,
-		    "project_id": 1006842
-		  },
-		  "user": {
-		    "id": "3234",             // 玩家id
-		    "server": "S1",           // 玩家服务器id
-		    "merchant_id": 1006805,
-		    "project_id": 1006842
-		  }
-		}
+			玩家信息查询类型的消息通知的数据结构
+			{
+			  "notification_type": "user_search",
+			  "merchant_id": 1006805,
+		      "project_id": 1006842,
+			  "data": {
+			    "merchant_id": 1006805,
+			    "project_id": 1006842,
+		        "player_id": "3234",             // 玩家id
+		        "server_id": "S1",               // 玩家服务器id
+				"mode": "live"                   // live | sandbox
+			  }
+			}
 	*/
 	///////////////////////////////////////////////////
 	// TODO 从数据库里面查询玩家信息
@@ -134,18 +133,17 @@ func (s *Sample) SearchUser(ctx context.Context, notification params.Notificatio
 // 如果不需要绑定服务器id，则不需要实现此方法
 func (s *Sample) ListServers(ctx context.Context, notification params.Notification) params.CommonResult {
 	/*
-		服务器列表查询类型消息通知的数据结构
-		{
-		  "notification_type": "server_list",
-		  "settings": {
-		    "merchant_id": 1006805,
-		    "project_id": 1006791
-		  },
-		  "user": {
-		    "merchant_id": 1006805,
-		    "project_id": 1006791
-		  }
-		}
+			服务器列表查询类型消息通知的数据结构
+			{
+			  "notification_type": "server_list",
+			  "merchant_id": 1006805,
+		      "project_id": 1006791,
+			  "data": {
+			    "merchant_id": 1006805,
+			    "project_id": 1006791,
+				"mode": "live"
+			  }
+			}
 	*/
 	///////////////////////////////////////////////////
 	// TODO 查询服务器列表
@@ -176,17 +174,25 @@ func (s *Sample) HandleOrder(ctx context.Context, notification params.Notificati
 		{
 		  "event_id": "2bc3a80f944e9777c31235344c7868d3",
 		  "notification_type": "order",
-		  "settings": {
-		    "merchant_id": 1000001,
-		    "project_id": 1000002
-		  },
+		  "merchant_id": 1000001,
+		  "project_id": 1000002,
 		  "data": {
+			"order_id": "100100001965",
+		    "transaction_id": "23051510001930",
+		    "merchant_id": 5,
+		    "project_id": 1000002,
 		    "amount": 1,
 		    "country": "BR",
 		    "create_time": 1684152939,
+		    "update_time": 1684153841,
 		    "currency": "BRL",
 		    "language": "cn",
-		    "merchant_id": 5,
+		    "mode": "live",
+		    "player_id": "123456",  // 玩家游戏中的uid，必传
+			"server_id": "S1",      // 玩家所在服务器id，非必传
+		    "payment_type": 1,
+		    "rfc_1766_language": "zh-CN",
+		    "status": "PAID",
 		    "metadata": {
 		      "gifts": [
 		        {
@@ -232,18 +238,7 @@ func (s *Sample) HandleOrder(ctx context.Context, notification params.Notificati
 		          "stop_time": 4822948800
 		        }
 		      ]
-		    },
-		    "mode": "live",
-		    "payer": {
-		        "id": "123456",  // 玩家游戏中的uid，必传
-		        "server": "S1",  // 玩家所在服务器id，非必传
-		    },
-		    "payer_id": "123456",
-		    "payment_type": 1,
-		    "project_id": 1000002,
-		    "rfc_1766_language": "zh-CN",
-		    "status": "PAID",
-		    "transaction_id": "23051510001930"
+		    }
 		  }
 		}
 
@@ -301,59 +296,62 @@ func (s *Sample) HandleOrder(ctx context.Context, notification params.Notificati
 // HandleGift 处理赠品发放相关的消息通知
 func (s *Sample) HandleGift(ctx context.Context, notification params.Notification) params.CommonResult {
 	/*
-			发放赠品类型的消息通知数据结构
-		{
-		  "event_id": "",
-		  "project_id": 1000002,
-		  "notification_type": "gift",
-		  "data": {
-		    "merchant_id": 1000001,
-		    "project_id": 1000002,
-		    "player_id": "tsb-1777777",
-		    "server_id": "S2",
-		    "mode": "",
-		    "biz_info": {
-		      "id": 452,
-		      "name": "测试签到",
-		      "type": 4,
-		      "start_time": 1706237987,
-		      "Stop_time": 1706324387,
-		      "biz_type": "activity"
-		    },
-		    "gift_info": {
-		      "gift_list": [
-		        {
-		          "gift_goods_id": "1212121",
-		          "num": 1,
-		          "gift_goods_logo": "https://kopglobal.com/8d8027490711352f8673cdd890a25f0d.jpeg"
-		        }
-		      ]
-		    },
-		    "create_time": 1706239355,
-		    "language": "",
-		    "rfc_1766_language": "",
-		    "metadata": {
-		      "sign_in_rule_type": 2,
-		      "is_circulate": false,
-		      "sign_in_total_days": 1,
-		      "free_appending_days": 0,
-		      "gift_list": [
-		        {
-		          "gift_goods_id": "1212121",
-		          "num": 1,
-		          "gift_goods_logo": "https://kopglobal.com/8d8027490711352f8673cdd890a25f0d.jpeg",
-		          "day_no": 1,
-		          "is_sign_in": false,
-		          "is_available_sign_in": false,
-		          "is_appending": false
-		        }
-		      ],
-		      "consecutive_gift_list": [
+				发放赠品类型的消息通知数据结构
+			{
+			  "event_id": "2bc3a80f944e9777c31235344c7868e5",
+		      "merchant_id": 1000001,
+			  "project_id": 1000002,
+			  "notification_type": "gift",
+			  "data": {
+				"gift_id": "100100001988",
+			    "merchant_id": 1000001,
+			    "project_id": 1000002,
+			    "player_id": "123456",
+			    "server_id": "S2",
+			    "mode": "sandbox",
+			    "biz_info": {
+			      "id": 452,
+			      "name": "测试签到",
+			      "type": 4,
+			      "start_time": 1706237987,
+			      "Stop_time": 1706324387,
+			      "biz_type": "activity"
+			    },
+			    "gift_info": {
+			      "gift_list": [
+			        {
+			          "gift_goods_id": "1212121",
+			          "num": 1,
+			          "gift_goods_logo": "https://kopglobal.com/8d8027490711352f8673cdd890a25f0d.jpeg"
+			        }
+			      ]
+			    },
+			    "create_time": 1706239355,
+			    "update_time": 1706239466,
+			    "language": "",
+			    "rfc_1766_language": "",
+			    "metadata": {
+			      "sign_in_rule_type": 2,
+			      "is_circulate": false,
+			      "sign_in_total_days": 1,
+			      "free_appending_days": 0,
+			      "gift_list": [
+			        {
+			          "gift_goods_id": "1212121",
+			          "num": 1,
+			          "gift_goods_logo": "https://kopglobal.com/8d8027490711352f8673cdd890a25f0d.jpeg",
+			          "day_no": 1,
+			          "is_sign_in": false,
+			          "is_available_sign_in": false,
+			          "is_appending": false
+			        }
+			      ],
+			      "consecutive_gift_list": [
 
-		      ]
-		    }
-		  }
-		}
+			      ]
+			    }
+			  }
+			}
 	*/
 	res := params.CommonResult{
 		HttpStatusCode: http.StatusOK,
@@ -384,28 +382,28 @@ func (s *Sample) HandlePayment(ctx context.Context, notification params.Notifica
 		{
 		  "event_id": "d5e2487cf4e442369a9381e65958afd2",
 		  "notification_type": "payment",
-		  "settings": {
-		    "merchant_id": 1000001,
-		    "project_id": 1000002
-		  },
+		  "merchant_id": 1000001,
+		  "project_id": 1000002,
 		  "data": {
+		    "transaction_id": "23081060004113",
+		    "merchant_transaction_id": "600100004072",
+		    "merchant_id": 1000001,
+		    "project_id": 1000002,
+			"payment_method_code": "card",
 		    "amount": 8,
 		    "country": "HK",
 		    "create_time": 1691657752,
+			"update_time": 1691657861,
 		    "currency": "HKD",
-		    "merchant_id": 1000001,
-		    "merchant_transaction_id": "600100004072",
-		    "metadata": {
-		      "a": "1",
-		      "b": "2"
-		    },
 		    "mode": "sandbox",
 		    "payer": {
 		      "id": "player-FD1SETRGBVC"
 		    },
-		    "project_id": 1000002,
 		    "status": "PAID",
-		    "transaction_id": "23081060004113"
+		    "metadata": {
+		      "a": "1",
+		      "b": "2"
+		    }
 		  }
 		}
 	*/
@@ -444,26 +442,28 @@ func (s *Sample) HandleRefund(ctx context.Context, notification params.Notificat
 		{
 		    "event_id": "123abcdef123abcdef",           // 事件id
 		    "notification_type": "refund",              // 消息类型
+			"merchant_id": 1000001,                     // 商户id
+			"project_id": 1000002,                      // 应用id
 		    "data": {
-		        "create_time": 177123456,               // 创建时间
+		        "refund_id": "4232323232323",           // 退款id
+		        "transaction_id": "64232323232323",     // 原始交易id
 		        "amount": 100,                          // 金额
 		        "currency": "RUB",                      // 币种
 		        "reason": "",                           // 退款原因
-		        "refund_id": "4232323232323",           // 退款id
-		        "transaction_id": "64232323232323",     // 原始交易id
 		        "status": "REFUNDED",                   // 退款状态
+		        "create_time": 177123456,               // 创建时间
 		        "update_time": 177123456,               // 更新时间
-		        "metadata": {
-		            "a": "1",
-		            "b": "2"
-		        },                                      // 商户自定义数据
 		        "merchant_transaction_id": "123456",    // 商户端交易id
 		        "merchant_id": 1000001,                 // 商户id
 		        "project_id": 1000002,                  // 应用id
 		        "payer": {
 		            "id": "51232323323232"              // 商户端游戏内玩家id
 		        },
-		        "mode": "sandbox"                       // live正式环境，sandbox沙盒环境
+		        "mode": "sandbox",                      // live正式环境，sandbox沙盒环境
+		        "metadata": {
+		            "a": "1",
+		            "b": "2"
+		        }                                       // 商户自定义数据
 		    }
 		}
 	*/
@@ -502,26 +502,28 @@ func (s *Sample) HandleDispute(ctx context.Context, notification params.Notifica
 		{
 		    "event_id": "123abcdef123abcdef",           // 事件id
 		    "notification_type": "dispute",             // 消息类型
+			"merchant_id": 1000001,                     // 商户id
+			"project_id": 1000002,                      // 应用id
 		    "data": {
-		        "create_time": 177123456,               // 创建时间
+		        "dispute_id": "4232323232323",          // 拒付id
+		        "transaction_id": "64232323232323",     // 原始交易id
+		        "merchant_transaction_id": "123456",    // 商户端交易id
+		        "merchant_id": 1000001,                 // 商户id
+		        "project_id": 1000002,                  // 应用id
 		        "amount": 100,                          // 金额
 		        "currency": "RUB",                      // 币种
 		        "reason": "",                           // 退款原因
-		        "dispute_id": "4232323232323",          // 拒付id
-		        "transaction_id": "64232323232323",     // 原始交易id
 		        "status": "DISPUTE_ACCEPTED",           // 拒付状态
+		        "create_time": 177123456,               // 创建时间
 		        "update_time": 177123456,               // 更新时间
-		        "metadata": {
-		            "a": "1",
-		            "b": "2"
-		        },                                      // 商户自定义数据
-		        "merchant_transaction_id": "123456",    // 商户端交易id
-		        "merchant_id": 1000001,                      // 商户id
-		        "project_id": 1000002,                       // 应用id
 		        "payer": {
 		            "id": "51232323323232"              // 商户端游戏内玩家id
 		        },
-		        "mode": "sandbox"                       // live正式环境，sandbox沙盒环境
+		        "mode": "sandbox",                      // live正式环境，sandbox沙盒环境
+		        "metadata": {
+		            "a": "1",
+		            "b": "2"
+		        }                                       // 商户自定义数据
 		    }
 		}
 	*/

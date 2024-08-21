@@ -166,6 +166,7 @@ type GiftInfo struct {
 }
 
 type Gift struct {
+	GiftId          string                 `json:"gift_id"`           // 赠品记录id，类似于商城订单id
 	MerchantId      int64                  `json:"merchant_id"`       // 商户id
 	ProjectId       int64                  `json:"project_id"`        // 应用id
 	PlayerId        string                 `json:"player_id"`         // 玩家id
